@@ -2,6 +2,7 @@ import 'dotenv/config'
 const { env: { D_TOKEN, D_CLIENT_ID } } = process
 
 import { Client, GatewayIntentBits, REST } from 'discord.js';
+import { createAudioPlayer } from '@discordjs/voice';
 import { Routes } from 'discord-api-types/v10';
 import { SlashCommandBuilder } from '@discordjs/builders';
 import handlers from './handlers/index.js';
@@ -26,8 +27,18 @@ const commands = [
     .toJSON(),
 
   new SlashCommandBuilder()
-    .setName('stop')
+    .setName('leave')
     .setDescription('Остановить музыку и покинуть канал')
+    .toJSON(),
+
+  new SlashCommandBuilder()
+    .setName('pause')
+    .setDescription('Запаузить текущий трек')
+    .toJSON(),
+
+  new SlashCommandBuilder()
+    .setName('unpause')
+    .setDescription('Запаузить текущий трек')
     .toJSON(),
 ];
 
@@ -48,12 +59,15 @@ const rest = new REST({ version: '10' }).setToken(D_TOKEN);
   }
 })();
 
+const context = {
+  player: createAudioPlayer()
+}
 
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
   try {
-    await handlers[interaction.commandName](interaction)
-  } catch(err) {
+    await handlers[interaction.commandName](interaction, context)
+  } catch (err) {
     console.log(err)
   }
 });

@@ -6,6 +6,6 @@ export default async (interaction)=>{
     await connection.destroy()
     await interaction.reply(`Ухожу`);
   } catch(err) {
-    console.log(err)
+    console.error(err)
   }
 }
